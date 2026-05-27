@@ -72,15 +72,14 @@ func CaptureCommand(program string, args []string, outPath string, waitTime time
 		return fmt.Errorf("start wt: %w", err)
 	}
 
-	// Poll for the new window to appear
+	// Poll for the new window to appear (up to waitTime)
 	var hwnd uintptr
 	deadline := time.Now().Add(waitTime)
 	for time.Now().Before(deadline) {
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		afterWindows := enumerateVisibleWindows()
 		hwnd = findNewWindow(beforeWindows, afterWindows)
 		if hwnd != 0 {
-			time.Sleep(3 * time.Second) // let WT fully render content
 			break
 		}
 	}
@@ -89,28 +88,51 @@ func CaptureCommand(program string, args []string, outPath string, waitTime time
 		return fmt.Errorf("could not find new terminal window")
 	}
 
-	// Capture the window
+	// Wait for content to fully render. WT needs time to:
+	// 1. Initialize the terminal session
+	// 2. Run cmd.exe /k which launches moonpool
+	// 3. moonpool renders and outputs ANSI
+	// 4. WT's GPU renderer paints the content
+	time.Sleep(3 * time.Second)
+
+	// Bring to foreground and capture
 	img, err := captureWindow(hwnd)
 	if err != nil {
+		closeAndWait(hwnd)
 		return fmt.Errorf("capture window: %w", err)
 	}
 
 	// Save PNG
 	f, err := os.Create(outPath)
 	if err != nil {
+		closeAndWait(hwnd)
 		return fmt.Errorf("create file: %w", err)
 	}
 	defer f.Close()
 
 	if err := png.Encode(f, img); err != nil {
+		closeAndWait(hwnd)
 		return fmt.Errorf("encode png: %w", err)
 	}
 
-	// Close the WT window by sending WM_CLOSE
+	// Close and wait for the window to actually disappear
+	closeAndWait(hwnd)
+	return nil
+}
+
+// closeAndWait sends WM_CLOSE and waits until the window disappears.
+func closeAndWait(hwnd uintptr) {
 	procPostMessage := user32.NewProc("PostMessageW")
 	procPostMessage.Call(hwnd, 0x0010, 0, 0) // WM_CLOSE
 
-	return nil
+	// Poll until window is gone (up to 3 seconds)
+	for i := 0; i < 30; i++ {
+		time.Sleep(100 * time.Millisecond)
+		visible, _, _ := procIsWindowVisible.Call(hwnd)
+		if visible == 0 {
+			return
+		}
+	}
 }
 
 var (
