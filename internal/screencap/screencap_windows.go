@@ -80,7 +80,7 @@ func CaptureCommand(program string, args []string, outPath string, waitTime time
 		afterWindows := enumerateVisibleWindows()
 		hwnd = findNewWindow(beforeWindows, afterWindows)
 		if hwnd != 0 {
-			time.Sleep(2 * time.Second) // let WT fully render content
+			time.Sleep(3 * time.Second) // let WT fully render content
 			break
 		}
 	}

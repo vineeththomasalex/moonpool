@@ -274,7 +274,7 @@ func TestNegativeEmptyContent(t *testing.T) {
 				t.Fatalf("Render(%q) failed: %v", tc.input, err)
 			}
 			htmlOut := string(terminal.Render([]byte(out)))
-			addReportEntry(t.Name(), true, tc.input, htmlOut)
+			addReportEntryWithMarkdown(t.Name(), true, tc.input, htmlOut, tc.input)
 		})
 	}
 }
@@ -305,7 +305,7 @@ func TestNegativeLongContent(t *testing.T) {
 	assertContains(t, out, "Section 200")
 
 	htmlOut := string(terminal.Render([]byte(out)))
-	addReportEntry(t.Name(), true, "# Long Document\n\n## Section 1 ... ## Section 200\n(200 sections, truncated for report)", htmlOut)
+	addReportEntryWithMarkdown(t.Name(), true, "# Long Document\n\n## Section 1 ... ## Section 200\n(200 sections, truncated for report)", htmlOut, longInput)
 }
 
 func TestNegativeLongLine(t *testing.T) {
@@ -325,7 +325,7 @@ func TestNegativeLongLine(t *testing.T) {
 
 	assertContains(t, out, "word")
 	htmlOut := string(terminal.Render([]byte(out)))
-	addReportEntry(t.Name(), true, longLine[:100]+"... (1000 chars)", htmlOut)
+	addReportEntryWithMarkdown(t.Name(), true, longLine[:100]+"... (1000 chars)", htmlOut, longLine)
 }
 
 // --- Style Variation Tests ---
@@ -375,7 +375,7 @@ func TestRenderWidthVariations(t *testing.T) {
 			}
 			assertContains(t, out, "Width Test")
 			htmlOut := string(terminal.Render([]byte(out)))
-			addReportEntry(fmt.Sprintf("%s (width=%d)", t.Name(), w), true, input, htmlOut)
+			addReportEntryWithMarkdown(fmt.Sprintf("%s (width=%d)", t.Name(), w), true, input, htmlOut, input)
 		})
 	}
 }

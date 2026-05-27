@@ -61,6 +61,23 @@ func addReportEntryWithCommand(name string, pass bool, rawInput, htmlOutput stri
 	reportMu.Unlock()
 }
 
+// addReportEntryWithMarkdown writes inline markdown to a temp file and screenshots it.
+func addReportEntryWithMarkdown(name string, pass bool, rawInput, htmlOutput, markdown string) {
+	screenshot := ""
+	if moonpoolPath != "" && len(markdown) > 0 {
+		tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("moonpool_inline_%d.md", os.Getpid()))
+		if err := os.WriteFile(tmpFile, []byte(markdown), 0o644); err == nil {
+			screenshot = captureScreenshot(moonpoolPath, []string{"-s", "dark", "-w", "80", tmpFile})
+			os.Remove(tmpFile)
+		}
+	}
+	reportMu.Lock()
+	reportEntries = append(reportEntries, reportEntry{
+		Name: name, Pass: pass, RawInput: rawInput, HTMLOutput: htmlOutput, ScreenshotB64: screenshot,
+	})
+	reportMu.Unlock()
+}
+
 func captureFixtureScreenshot(fixtureName string, extraArgs ...string) string {
 	if moonpoolPath == "" || fixtureName == "" {
 		return ""
