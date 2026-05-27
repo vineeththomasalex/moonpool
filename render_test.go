@@ -356,8 +356,8 @@ func TestRenderDarkVsLight(t *testing.T) {
 
 	darkHTML := string(terminal.Render([]byte(darkOut)))
 	lightHTML := string(terminal.Render([]byte(lightOut)))
-	addReportEntryWithCommand(t.Name()+" (dark)", true, input, darkHTML, fmt.Sprintf("%s -s dark -w 80 testdata/fixtures/combined_readme.md", moonpoolPath))
-	addReportEntryWithCommand(t.Name()+" (light)", true, input, lightHTML, fmt.Sprintf("%s -s light -w 80 testdata/fixtures/combined_readme.md", moonpoolPath))
+	addReportEntryWithCommand(t.Name()+" (dark)", true, input, darkHTML, "-s", "dark", "-w", "80")
+	addReportEntryWithCommand(t.Name()+" (light)", true, input, lightHTML, "-s", "light", "-w", "80")
 }
 
 // --- Width Tests ---
