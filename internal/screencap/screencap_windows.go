@@ -80,7 +80,7 @@ func CaptureCommand(program string, args []string, outPath string, waitTime time
 		afterWindows := enumerateVisibleWindows()
 		hwnd = findNewWindow(beforeWindows, afterWindows)
 		if hwnd != 0 {
-			time.Sleep(1 * time.Second) // let content fully render
+			time.Sleep(2 * time.Second) // let WT fully render content
 			break
 		}
 	}
@@ -147,6 +147,10 @@ func findNewWindow(before, after map[uintptr]bool) uintptr {
 	return 0
 }
 
+var (
+	procSetForegroundWindow = user32.NewProc("SetForegroundWindow")
+)
+
 func captureWindow(hwnd uintptr) (*image.RGBA, error) {
 	var r rect
 	procGetWindowRect.Call(hwnd, uintptr(unsafe.Pointer(&r)))
@@ -157,27 +161,28 @@ func captureWindow(hwnd uintptr) (*image.RGBA, error) {
 		return nil, fmt.Errorf("invalid window dimensions: %dx%d", width, height)
 	}
 
-	// Get window DC
-	hdcWindow, _, _ := procGetDC.Call(hwnd)
-	defer procReleaseDC.Call(hwnd, hdcWindow)
+	// Bring window to foreground so it's fully rendered and visible
+	procSetForegroundWindow.Call(hwnd)
+	time.Sleep(300 * time.Millisecond)
 
-	// Create compatible DC and bitmap
-	hdcMem, _, _ := procCreateCompatDC.Call(hdcWindow)
+	// Use screen DC (not window DC) to capture GPU-rendered content.
+	// Windows Terminal uses DirectX rendering, so PrintWindow/GetDC(hwnd)
+	// returns empty frames. Screen capture via GetDC(0) gets the actual pixels.
+	hdcScreen, _, _ := procGetDC.Call(0) // 0 = entire screen
+	defer procReleaseDC.Call(0, hdcScreen)
+
+	hdcMem, _, _ := procCreateCompatDC.Call(hdcScreen)
 	defer procDeleteDC.Call(hdcMem)
 
-	hBitmap, _, _ := procCreateCompatBmp.Call(hdcWindow, uintptr(width), uintptr(height))
+	hBitmap, _, _ := procCreateCompatBmp.Call(hdcScreen, uintptr(width), uintptr(height))
 	defer procDeleteObject.Call(hBitmap)
 
 	procSelectObject.Call(hdcMem, hBitmap)
 
-	// PrintWindow with PW_RENDERFULLCONTENT (0x2)
-	ret, _, _ := procPrintWindow.Call(hwnd, hdcMem, 0x2)
-	if ret == 0 {
-		// Fallback: BitBlt from screen
-		const SRCCOPY = 0x00CC0020
-		procBitBlt.Call(hdcMem, 0, 0, uintptr(width), uintptr(height),
-			hdcWindow, 0, 0, SRCCOPY)
-	}
+	// BitBlt from screen at the window's position
+	const SRCCOPY = 0x00CC0020
+	procBitBlt.Call(hdcMem, 0, 0, uintptr(width), uintptr(height),
+		hdcScreen, uintptr(r.Left), uintptr(r.Top), SRCCOPY)
 
 	// Read pixels from bitmap
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
