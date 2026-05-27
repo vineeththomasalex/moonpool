@@ -71,7 +71,7 @@ func assertNotContains(t *testing.T, output, unexpected string) {
 
 func TestRenderHeadings(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "headings.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "headings.md")
 
 	assertContains(t, ansiOut, "Heading Level 1")
 	assertContains(t, ansiOut, "Heading Level 2")
@@ -87,7 +87,7 @@ func TestRenderHeadings(t *testing.T) {
 
 func TestRenderInlineFormatting(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "inline_formatting.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "inline_formatting.md")
 
 	assertContains(t, ansiOut, "bold text")
 	assertContains(t, ansiOut, "italic text")
@@ -100,7 +100,7 @@ func TestRenderInlineFormatting(t *testing.T) {
 
 func TestRenderCodeBlocks(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "code_blocks.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "code_blocks.md")
 
 	assertContains(t, ansiOut, "fmt.Println")
 	assertContains(t, ansiOut, "Hello, World!")
@@ -113,7 +113,7 @@ func TestRenderCodeBlocks(t *testing.T) {
 
 func TestRenderLists(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "lists.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "lists.md")
 
 	assertContains(t, ansiOut, "Item one")
 	assertContains(t, ansiOut, "First item")
@@ -125,7 +125,7 @@ func TestRenderLists(t *testing.T) {
 
 func TestRenderLinksImages(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "links_images.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "links_images.md")
 
 	assertContains(t, ansiOut, "a link to example")
 	assertContains(t, ansiOut, "reference link")
@@ -136,7 +136,7 @@ func TestRenderLinksImages(t *testing.T) {
 
 func TestRenderTables(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "tables.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "tables.md")
 
 	assertContains(t, ansiOut, "Alice")
 	assertContains(t, ansiOut, "Bob")
@@ -148,7 +148,7 @@ func TestRenderTables(t *testing.T) {
 
 func TestRenderBlockquotes(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "blockquotes.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "blockquotes.md")
 
 	assertContains(t, ansiOut, "This is a blockquote")
 	assertContains(t, ansiOut, "Level one")
@@ -158,7 +158,7 @@ func TestRenderBlockquotes(t *testing.T) {
 
 func TestRenderHorizontalRules(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "horizontal_rules.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "horizontal_rules.md")
 
 	assertContains(t, ansiOut, "Content above the rule")
 	assertContains(t, ansiOut, "Content between rules")
@@ -169,7 +169,7 @@ func TestRenderHorizontalRules(t *testing.T) {
 
 func TestRenderTaskLists(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "task_lists.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "task_lists.md")
 
 	assertContains(t, ansiOut, "Completed task")
 	assertContains(t, ansiOut, "Incomplete task")
@@ -179,7 +179,7 @@ func TestRenderTaskLists(t *testing.T) {
 
 func TestRenderEmoji(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "emoji.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "emoji.md")
 
 	assertContains(t, ansiOut, "🚀")
 	assertContains(t, ansiOut, "📎")
@@ -189,7 +189,7 @@ func TestRenderEmoji(t *testing.T) {
 
 func TestRenderFrontmatter(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "frontmatter.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "frontmatter.md")
 
 	// Frontmatter is NOT stripped by glamour — it's stripped by utils.RemoveFrontmatter
 	// before rendering. Here we test glamour's raw handling.
@@ -201,7 +201,7 @@ func TestRenderFrontmatter(t *testing.T) {
 
 func TestRenderCombinedReadme(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "combined_readme.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "combined_readme.md")
 
 	assertContains(t, ansiOut, "Moonpool")
 	assertContains(t, ansiOut, "Syntax Highlighting")
@@ -215,7 +215,7 @@ func TestRenderCombinedReadme(t *testing.T) {
 
 func TestNegativeMermaid(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "negative_mermaid.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "negative_mermaid.md")
 
 	// Mermaid should render as a code block, not crash
 	assertContains(t, ansiOut, "graph LR")
@@ -225,7 +225,7 @@ func TestNegativeMermaid(t *testing.T) {
 
 func TestNegativeMath(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "negative_math.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "negative_math.md")
 
 	// Math should appear as text, not crash
 	assertContains(t, ansiOut, "E = mc")
@@ -234,7 +234,7 @@ func TestNegativeMath(t *testing.T) {
 
 func TestNegativeHTML(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "negative_html.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "negative_html.md")
 
 	// HTML should be handled gracefully
 	assertContains(t, ansiOut, "Raw HTML Elements")
@@ -242,7 +242,7 @@ func TestNegativeHTML(t *testing.T) {
 
 func TestNegativeFootnotes(t *testing.T) {
 	raw, ansiOut, htmlOut := renderFixture(t, "negative_footnotes.md")
-	addReportEntryWithANSI(t.Name(), true, raw, htmlOut, ansiOut)
+addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "negative_footnotes.md")
 
 	// Footnotes should not crash
 	assertContains(t, ansiOut, "footnote")
@@ -274,7 +274,7 @@ func TestNegativeEmptyContent(t *testing.T) {
 				t.Fatalf("Render(%q) failed: %v", tc.input, err)
 			}
 			htmlOut := string(terminal.Render([]byte(out)))
-			addReportEntryWithANSI(t.Name(), true, tc.input, htmlOut, out)
+			addReportEntry(t.Name(), true, tc.input, htmlOut)
 		})
 	}
 }
@@ -305,7 +305,7 @@ func TestNegativeLongContent(t *testing.T) {
 	assertContains(t, out, "Section 200")
 
 	htmlOut := string(terminal.Render([]byte(out)))
-	addReportEntryWithANSI(t.Name(), true, "# Long Document\n\n## Section 1 ... ## Section 200\n(200 sections, truncated for report)", htmlOut, out)
+	addReportEntry(t.Name(), true, "# Long Document\n\n## Section 1 ... ## Section 200\n(200 sections, truncated for report)", htmlOut)
 }
 
 func TestNegativeLongLine(t *testing.T) {
@@ -325,7 +325,7 @@ func TestNegativeLongLine(t *testing.T) {
 
 	assertContains(t, out, "word")
 	htmlOut := string(terminal.Render([]byte(out)))
-	addReportEntryWithANSI(t.Name(), true, longLine[:100]+"... (1000 chars)", htmlOut, out)
+	addReportEntry(t.Name(), true, longLine[:100]+"... (1000 chars)", htmlOut)
 }
 
 // --- Style Variation Tests ---
@@ -356,8 +356,8 @@ func TestRenderDarkVsLight(t *testing.T) {
 
 	darkHTML := string(terminal.Render([]byte(darkOut)))
 	lightHTML := string(terminal.Render([]byte(lightOut)))
-	addReportEntryWithANSI(t.Name()+" (dark)", true, input, darkHTML, darkOut)
-	addReportEntryWithANSI(t.Name()+" (light)", true, input, lightHTML, lightOut)
+	addReportEntryWithCommand(t.Name()+" (dark)", true, input, darkHTML, fmt.Sprintf("%s -s dark -w 80 testdata/fixtures/combined_readme.md", moonpoolPath))
+	addReportEntryWithCommand(t.Name()+" (light)", true, input, lightHTML, fmt.Sprintf("%s -s light -w 80 testdata/fixtures/combined_readme.md", moonpoolPath))
 }
 
 // --- Width Tests ---
@@ -375,7 +375,7 @@ func TestRenderWidthVariations(t *testing.T) {
 			}
 			assertContains(t, out, "Width Test")
 			htmlOut := string(terminal.Render([]byte(out)))
-			addReportEntryWithANSI(fmt.Sprintf("%s (width=%d)", t.Name(), w), true, input, htmlOut, out)
+			addReportEntry(fmt.Sprintf("%s (width=%d)", t.Name(), w), true, input, htmlOut)
 		})
 	}
 }

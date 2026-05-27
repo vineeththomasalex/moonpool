@@ -14,25 +14,26 @@ import (
 
 // reportEntry holds one test's rendered output for the HTML report.
 type reportEntry struct {
-	Name         string
-	Pass         bool
-	RawInput     string
-	HTMLOutput   string
-	ScreenshotB64 string // base64-encoded PNG from freeze (empty if freeze unavailable)
+	Name          string
+	Pass          bool
+	RawInput      string
+	HTMLOutput    string
+	ScreenshotB64 string // base64-encoded PNG from freeze (empty if unavailable)
 }
 
 var (
 	reportMu      sync.Mutex
 	reportEntries []reportEntry
 	freezePath    string // resolved once in TestMain
+	moonpoolPath  string // path to built moonpool binary
 )
 
 // screenshotsEnabled is set by the -screenshots flag.
-// When false (default), the report uses HTML rendering (fast).
-// When true, freeze generates PNG screenshots (slower but pixel-perfect).
-var screenshotsEnabled = flag.Bool("screenshots", false, "generate PNG screenshots in test report (requires freeze)")
+// When false (default), the report uses HTML rendering (fast, ~1s).
+// When true, freeze runs moonpool and captures real rendered output as PNG (~45s).
+var screenshotsEnabled = flag.Bool("screenshots", false, "generate PNG screenshots in test report (requires freeze + built moonpool binary)")
 
-// addReportEntry records a test's rendered output for inclusion in the HTML report.
+// addReportEntry records a test's rendered output (no screenshot).
 func addReportEntry(name string, pass bool, rawInput, htmlOutput string) {
 	reportMu.Lock()
 	reportEntries = append(reportEntries, reportEntry{
@@ -44,11 +45,13 @@ func addReportEntry(name string, pass bool, rawInput, htmlOutput string) {
 	reportMu.Unlock()
 }
 
-// addReportEntryWithANSI records a test's output and generates a freeze screenshot.
-func addReportEntryWithANSI(name string, pass bool, rawInput, htmlOutput, ansiOutput string) {
+// addReportEntryWithFixture records output and generates a screenshot by running moonpool on the fixture.
+func addReportEntryWithFixture(name string, pass bool, rawInput, htmlOutput, fixtureName string) {
 	screenshot := ""
-	if freezePath != "" && len(ansiOutput) > 0 {
-		screenshot = generateScreenshot(ansiOutput)
+	if freezePath != "" && moonpoolPath != "" && fixtureName != "" {
+		fixtureFile := filepath.Join("testdata", "fixtures", fixtureName)
+		execCmd := fmt.Sprintf("%s -s dark -w 80 %s", moonpoolPath, fixtureFile)
+		screenshot = generateScreenshot(execCmd)
 	}
 	reportMu.Lock()
 	reportEntries = append(reportEntries, reportEntry{
@@ -61,57 +64,68 @@ func addReportEntryWithANSI(name string, pass bool, rawInput, htmlOutput, ansiOu
 	reportMu.Unlock()
 }
 
-// generateScreenshot uses freeze --execute to render ANSI output as a PNG, returns base64.
-func generateScreenshot(ansiOutput string) string {
-	tmpDir := os.TempDir()
-	ansiFile := filepath.Join(tmpDir, "moonpool_test_ansi.txt")
-	pngFile := filepath.Join(tmpDir, "moonpool_test_screenshot.png")
+// addReportEntryWithCommand records output and generates a screenshot by running a custom command.
+func addReportEntryWithCommand(name string, pass bool, rawInput, htmlOutput, execCommand string) {
+	screenshot := ""
+	if freezePath != "" && execCommand != "" {
+		screenshot = generateScreenshot(execCommand)
+	}
+	reportMu.Lock()
+	reportEntries = append(reportEntries, reportEntry{
+		Name:          name,
+		Pass:          pass,
+		RawInput:      rawInput,
+		HTMLOutput:    htmlOutput,
+		ScreenshotB64: screenshot,
+	})
+	reportMu.Unlock()
+}
 
+// generateScreenshot runs freeze --execute with the given command and returns base64 PNG.
+func generateScreenshot(execCmd string) string {
+	pngFile := filepath.Join(os.TempDir(), fmt.Sprintf("moonpool_ss_%d.png", os.Getpid()))
 	os.Remove(pngFile)
 
-	// Write ANSI to a temp file so we can cat it through freeze --execute.
-	if err := os.WriteFile(ansiFile, []byte(ansiOutput), 0o644); err != nil {
-		return ""
-	}
-	defer os.Remove(ansiFile)
-
-	// Use --execute with cmd /c type to preserve ANSI escape sequences.
-	// freeze --execute runs the command in a PTY and captures the rendered output.
-	execCmd := fmt.Sprintf("cmd /c type %s", ansiFile)
 	cmd := exec.Command(freezePath,
 		"--execute", execCmd,
 		"-o", pngFile,
+		"--window", "false",
 		"--shadow.blur", "0",
 		"--padding", "20,40,20,20",
 		"--margin", "0",
 		"--border.radius", "0",
-		"--window", "false",
 	)
 	if err := cmd.Run(); err != nil {
 		return ""
 	}
-	defer os.Remove(pngFile)
 
 	data, err := os.ReadFile(pngFile)
+	os.Remove(pngFile)
 	if err != nil {
 		return ""
 	}
-
 	return base64.StdEncoding.EncodeToString(data)
 }
 
 func TestMain(m *testing.M) {
 	flag.Parse()
 
-	// Detect freeze binary for screenshot generation.
-	// Screenshots are opt-in: run with -screenshots to enable.
-	// Example: go test ./... -screenshots
 	if *screenshotsEnabled {
+		// Detect freeze binary
 		if p, err := exec.LookPath("freeze"); err == nil {
 			freezePath = p
-			fmt.Fprintf(os.Stderr, "📸 freeze detected at %s — screenshots enabled\n", p)
+			fmt.Fprintf(os.Stderr, "📸 freeze detected at %s\n", p)
 		} else {
 			fmt.Fprintf(os.Stderr, "📸 freeze not found — install: go install github.com/charmbracelet/freeze@latest\n")
+		}
+
+		// Find built moonpool binary (used by freeze --execute to render fixtures)
+		if _, err := os.Stat("moonpool.exe"); err == nil {
+			abs, _ := filepath.Abs("moonpool.exe")
+			moonpoolPath = abs
+			fmt.Fprintf(os.Stderr, "📸 moonpool binary: %s\n", abs)
+		} else {
+			fmt.Fprintf(os.Stderr, "📸 moonpool.exe not found — run 'go build -o moonpool.exe .' first for screenshots\n")
 		}
 	}
 
