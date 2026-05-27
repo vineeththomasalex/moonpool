@@ -1,4 +1,6 @@
 glow
+moonpool
+moonpool.exe
 dist/
 .envrc
 completions/
