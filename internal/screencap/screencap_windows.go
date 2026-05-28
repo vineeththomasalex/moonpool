@@ -89,17 +89,32 @@ func CaptureCommand(program string, args []string, outPath string, waitTime time
 	}
 
 	// Wait for content to fully render. WT needs time to:
-	// 1. Initialize the terminal session
+	// 1. Initialize the terminal session (extra slow on first launch)
 	// 2. Run cmd.exe /k which launches moonpool
 	// 3. moonpool renders and outputs ANSI
 	// 4. WT's GPU renderer paints the content
-	time.Sleep(3 * time.Second)
+	if !wtWarmedUp {
+		// First WT launch — WT itself needs to start up
+		time.Sleep(5 * time.Second)
+		wtWarmedUp = true
+	} else {
+		time.Sleep(3 * time.Second)
+	}
 
-	// Bring to foreground and capture
-	img, err := captureWindow(hwnd)
-	if err != nil {
-		closeAndWait(hwnd)
-		return fmt.Errorf("capture window: %w", err)
+	// Capture with retry — if image is blank, wait and try again
+	var img *image.RGBA
+	for attempt := 0; attempt < 3; attempt++ {
+		var err2 error
+		img, err2 = captureWindow(hwnd)
+		if err2 != nil {
+			closeAndWait(hwnd)
+			return fmt.Errorf("capture window: %w", err2)
+		}
+		if !isBlankImage(img) {
+			break
+		}
+		// Image is blank — wait and retry
+		time.Sleep(2 * time.Second)
 	}
 
 	// Save PNG
@@ -172,6 +187,39 @@ func findNewWindow(before, after map[uintptr]bool) uintptr {
 var (
 	procSetForegroundWindow = user32.NewProc("SetForegroundWindow")
 )
+
+// wtWarmedUp tracks whether the first WT window has been launched.
+// The first launch is much slower as WT itself needs to initialize.
+var wtWarmedUp bool
+
+// isBlankImage checks if an image is essentially a single solid color
+// (indicating the terminal hasn't rendered content yet).
+func isBlankImage(img *image.RGBA) bool {
+	if img == nil {
+		return true
+	}
+	bounds := img.Bounds()
+	if bounds.Dx() < 10 || bounds.Dy() < 10 {
+		return true
+	}
+
+	// Sample pixels from the middle of the image
+	// If they're all the same color, the image is blank
+	midY := bounds.Dy() / 2
+	refR, refG, refB, _ := img.At(bounds.Dx()/4, midY).RGBA()
+	uniqueColors := 0
+
+	for x := bounds.Dx()/4; x < 3*bounds.Dx()/4; x += 10 {
+		r, g, b, _ := img.At(x, midY).RGBA()
+		if r != refR || g != refG || b != refB {
+			uniqueColors++
+			if uniqueColors > 3 {
+				return false // has real content
+			}
+		}
+	}
+	return true // all sampled pixels are the same color
+}
 
 func captureWindow(hwnd uintptr) (*image.RGBA, error) {
 	var r rect
