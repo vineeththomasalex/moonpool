@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/ansi"
 	"github.com/charmbracelet/glamour/styles"
+	"github.com/charmbracelet/glow/v2/internal/moonpoolstyle"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mitchellh/go-homedir"
 )
@@ -71,33 +72,23 @@ func IsMarkdownFile(filename string) bool {
 
 // GlamourStyle returns a glamour.TermRendererOption based on the given style.
 func GlamourStyle(style string, isCode bool) glamour.TermRendererOption {
-	if !isCode {
-		if style == styles.AutoStyle {
-			return glamour.WithAutoStyle()
-		}
-		return glamour.WithStylePath(style)
-	}
-
-	// If we are rendering a pure code block, we need to modify the style to
-	// remove the indentation.
-
 	var styleConfig ansi.StyleConfig
 
 	switch style {
 	case styles.AutoStyle:
 		if lipgloss.HasDarkBackground() {
-			styleConfig = styles.DarkStyleConfig
+			styleConfig = moonpoolstyle.Config()
 		} else {
 			styleConfig = styles.LightStyleConfig
 		}
 	case styles.DarkStyle:
-		styleConfig = styles.DarkStyleConfig
+		styleConfig = moonpoolstyle.Config()
 	case styles.LightStyle:
 		styleConfig = styles.LightStyleConfig
 	case styles.PinkStyle:
 		styleConfig = styles.PinkStyleConfig
 	case styles.NoTTYStyle:
-		styleConfig = styles.NoTTYStyleConfig
+		styleConfig = moonpoolstyle.NoTTYConfig()
 	case styles.DraculaStyle:
 		styleConfig = styles.DraculaStyleConfig
 	case styles.TokyoNightStyle:
@@ -106,8 +97,10 @@ func GlamourStyle(style string, isCode bool) glamour.TermRendererOption {
 		return glamour.WithStylesFromJSONFile(style)
 	}
 
-	var margin uint
-	styleConfig.CodeBlock.Margin = &margin
+	if isCode {
+		var margin uint
+		styleConfig.CodeBlock.Margin = &margin
+	}
 
 	return glamour.WithStyles(styleConfig)
 }

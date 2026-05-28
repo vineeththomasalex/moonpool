@@ -1,5 +1,8 @@
 glow
+moonpool
+moonpool.exe
 dist/
 .envrc
 completions/
 manpages/
+testdata/report.html

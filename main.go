@@ -18,6 +18,10 @@ import (
 	"github.com/caarlos0/env/v11"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/styles"
+	"github.com/charmbracelet/glow/v2/internal/alerts"
+	"github.com/charmbracelet/glow/v2/internal/highlight"
+	"github.com/charmbracelet/glow/v2/internal/links"
+	"github.com/charmbracelet/glow/v2/internal/typography"
 	"github.com/charmbracelet/glow/v2/ui"
 	"github.com/charmbracelet/glow/v2/utils"
 	"github.com/charmbracelet/lipgloss"
@@ -306,12 +310,19 @@ func executeCLI(cmd *cobra.Command, src *source, w io.Writer) error {
 	ext := filepath.Ext(src.URL)
 	if isCode {
 		content = utils.WrapCodeBlock(string(b), ext)
+	} else {
+		content = alerts.Process(content)
+		content = highlight.Process(content)
+		content = typography.Process(content)
 	}
 
 	out, err := r.Render(content)
 	if err != nil {
 		return fmt.Errorf("unable to render markdown: %w", err)
 	}
+
+	// Post-process: add OSC 8 clickable hyperlinks
+	out = links.AddOSC8Links(out)
 
 	// display
 	switch {
