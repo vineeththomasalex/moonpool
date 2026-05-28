@@ -12,7 +12,9 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/styles"
 	"github.com/charmbracelet/glow/v2/internal/alerts"
+	"github.com/charmbracelet/glow/v2/internal/highlight"
 	"github.com/charmbracelet/glow/v2/internal/links"
+	"github.com/charmbracelet/glow/v2/internal/typography"
 	"github.com/charmbracelet/x/exp/golden"
 )
 
@@ -38,6 +40,8 @@ func renderFixture(t *testing.T, name string) (raw, ansiOut, htmlOut string) {
 
 	// Apply the same preprocessing as the real pipeline
 	content := alerts.Process(raw)
+	content = highlight.Process(content)
+	content = typography.Process(content)
 
 	ansiOut, err = r.Render(content)
 	if err != nil {
@@ -263,6 +267,44 @@ func TestRenderAlerts(t *testing.T) {
 
 	// Regular blockquote should still work
 	assertContains(t, ansiOut, "regular blockquote")
+
+	golden.RequireEqual(t, []byte(ansiOut))
+}
+
+func TestRenderHighlight(t *testing.T) {
+	raw, ansiOut, htmlOut := renderFixture(t, "highlight.md")
+	addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "highlight.md")
+
+	// Highlights should be transformed to bold with marker
+	assertContains(t, ansiOut, "🟡")
+	assertContains(t, ansiOut, "highlighted text")
+	assertContains(t, ansiOut, "first highlight")
+	assertContains(t, ansiOut, "second highlight")
+
+	// Raw ==text== should not appear
+	assertNotContains(t, ansiOut, "==highlighted text==")
+	assertNotContains(t, ansiOut, "==first highlight==")
+
+	// Regular text preserved
+	assertContains(t, ansiOut, "Regular text without any highlights")
+
+	golden.RequireEqual(t, []byte(ansiOut))
+}
+
+func TestRenderTypography(t *testing.T) {
+	raw, ansiOut, htmlOut := renderFixture(t, "typography.md")
+	addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "typography.md")
+
+	// Em dash
+	assertContains(t, ansiOut, "—")
+	// En dash
+	assertContains(t, ansiOut, "–")
+	// Ellipsis
+	assertContains(t, ansiOut, "…")
+
+	// Code spans should NOT be transformed
+	assertContains(t, ansiOut, "--verbose")
+	assertContains(t, ansiOut, "--flag-a")
 
 	golden.RequireEqual(t, []byte(ansiOut))
 }

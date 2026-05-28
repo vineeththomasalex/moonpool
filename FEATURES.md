@@ -124,7 +124,7 @@ Should emit: \e]8;;https://example.com\aclick me\e]8;;\a
 
 ---
 
-#### 4. Clipboard Copy
+#### ~~4. Clipboard Copy~~ ✅ ALREADY IMPLEMENTED
 | Dimension | Rating |
 |-----------|--------|
 | Relevance | 🟡 Common — useful for copying code snippets |
@@ -137,7 +137,7 @@ Should emit: \e]8;;https://example.com\aclick me\e]8;;\a
 
 ---
 
-#### 5. Highlight / Mark `==text==`
+#### ~~5. Highlight / Mark `==text==`~~ ✅ IMPLEMENTED
 ```markdown
 This is ==highlighted text== in a sentence.
 ```
@@ -153,7 +153,7 @@ This is ==highlighted text== in a sentence.
 
 ---
 
-#### 6. Smart Typography (Typographer)
+#### ~~6. Smart Typography (Typographer)~~ ✅ IMPLEMENTED
 | Dimension | Rating |
 |-----------|--------|
 | Relevance | 🟢 Niche — nice to have |
@@ -367,9 +367,9 @@ Worth noting: glamour has a known bug (issue #313) where nested blockquotes are 
 | ~~1~~ | ~~GitHub Alerts/Admonitions~~ | 🔴 Critical | 🟦 Easy | ✅ Done |
 | ~~2~~ | ~~OSC 8 Clickable Links~~ | 🔴 Critical | ⬜ Trivial | ✅ Done |
 | ~~3~~ | ~~Live Reload~~ | 🟡 Common | ⬜ Trivial | ✅ Already existed |
-| 4 | Clipboard Copy | 🟡 Common | ⬜ Trivial | ✅ Yes |
-| 5 | Highlight `==text==` | 🟢 Niche | 🟦 Easy | ✅ Yes |
-| 6 | Smart Typography | 🟢 Niche | ⬜ Trivial | ✅ Yes |
+| ~~4~~ | ~~Clipboard Copy~~ | 🟡 Common | ⬜ Trivial | ✅ Already existed |
+| ~~5~~ | ~~Highlight `==text==`~~ | 🟢 Niche | 🟦 Easy | ✅ Done |
+| ~~6~~ | ~~Smart Typography~~ | 🟢 Niche | ⬜ Trivial | ✅ Done |
 | 7 | Footnotes | 🟡 Common | 🟨 Medium | |
 | 8 | In-Document Search | 🔴 Critical | 🟨 Medium | |
 | 9 | TOC / Outline Nav | 🟡 Common | 🟨 Medium | |
