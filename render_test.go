@@ -11,10 +11,12 @@ import (
 	terminal "github.com/buildkite/terminal-to-html/v3"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/styles"
+	"github.com/charmbracelet/glow/v2/internal/alerts"
 	"github.com/charmbracelet/x/exp/golden"
 )
 
-// renderFixture loads a fixture file and renders it through glamour.
+// renderFixture loads a fixture file and renders it through the same pipeline
+// as moonpool: alerts preprocessing → glamour rendering.
 // Returns the raw markdown, rendered ANSI, and rendered HTML.
 func renderFixture(t *testing.T, name string) (raw, ansiOut, htmlOut string) {
 	t.Helper()
@@ -33,7 +35,10 @@ func renderFixture(t *testing.T, name string) (raw, ansiOut, htmlOut string) {
 		t.Fatalf("failed to create renderer: %v", err)
 	}
 
-	ansiOut, err = r.Render(raw)
+	// Apply the same preprocessing as the real pipeline
+	content := alerts.Process(raw)
+
+	ansiOut, err = r.Render(content)
 	if err != nil {
 		t.Fatalf("failed to render %s: %v", name, err)
 	}
@@ -207,6 +212,40 @@ addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "combined_readme.md")
 	assertContains(t, ansiOut, "Syntax Highlighting")
 	assertContains(t, ansiOut, "go install")
 	assertContains(t, ansiOut, "style")
+
+	golden.RequireEqual(t, []byte(ansiOut))
+}
+
+// --- GitHub Alerts ---
+
+func TestRenderAlerts(t *testing.T) {
+	raw, ansiOut, htmlOut := renderFixture(t, "alerts.md")
+	addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "alerts.md")
+
+	// All 5 alert types should have their icons rendered
+	assertContains(t, ansiOut, "ℹ️")
+	assertContains(t, ansiOut, "Note")
+	assertContains(t, ansiOut, "💡")
+	assertContains(t, ansiOut, "Tip")
+	assertContains(t, ansiOut, "❗")
+	assertContains(t, ansiOut, "Important")
+	assertContains(t, ansiOut, "⚠️")
+	assertContains(t, ansiOut, "Warning")
+	assertContains(t, ansiOut, "🔴")
+	assertContains(t, ansiOut, "Caution")
+
+	// Alert content should be present
+	assertContains(t, ansiOut, "Useful information")
+	assertContains(t, ansiOut, "Helpful advice")
+	assertContains(t, ansiOut, "Urgent info")
+
+	// Raw [!TYPE] tags should NOT appear (they were preprocessed away)
+	assertNotContains(t, ansiOut, "[!NOTE]")
+	assertNotContains(t, ansiOut, "[!TIP]")
+	assertNotContains(t, ansiOut, "[!WARNING]")
+
+	// Regular blockquote should still work
+	assertContains(t, ansiOut, "regular blockquote")
 
 	golden.RequireEqual(t, []byte(ansiOut))
 }
