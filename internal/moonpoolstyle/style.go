@@ -19,24 +19,24 @@ func uintPtr(u uint) *uint       { return &u }
 func Config() ansi.StyleConfig {
 	s := styles.DarkStyleConfig
 
-	// H1: Bright blue, bold, ═══ underline
+	// H1: Bright blue, bold, underlined
 	s.H1 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
-			Prefix:      " ",
-			Color:       stringPtr("#5fafff"),
-			Bold:        boolPtr(true),
-			BlockSuffix: "\n  ═══════════════════════════════════════════════════\n",
+			Prefix:    " ",
+			Color:     stringPtr("#5fafff"),
+			Bold:      boolPtr(true),
+			Underline: boolPtr(true),
 		},
 		Indent: uintPtr(1),
 	}
 
-	// H2: Medium blue, bold, ─── underline
+	// H2: Medium blue, bold, underlined
 	s.H2 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
-			Prefix:      " ",
-			Color:       stringPtr("#5f87d7"),
-			Bold:        boolPtr(true),
-			BlockSuffix: "\n    ───────────────────────────────────────────────\n",
+			Prefix:    " ",
+			Color:     stringPtr("#5f87d7"),
+			Bold:      boolPtr(true),
+			Underline: boolPtr(true),
 		},
 		Indent: uintPtr(2),
 	}
