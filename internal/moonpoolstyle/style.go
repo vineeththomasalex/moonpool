@@ -23,6 +23,7 @@ func Config() ansi.StyleConfig {
 	s.H1 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix:    " ",
+			Suffix:    " ",
 			Color:     stringPtr("#5fafff"),
 			Bold:      boolPtr(true),
 			Underline: boolPtr(true),
@@ -34,6 +35,7 @@ func Config() ansi.StyleConfig {
 	s.H2 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix:    " ",
+			Suffix:    " ",
 			Color:     stringPtr("#5f87d7"),
 			Bold:      boolPtr(true),
 			Underline: boolPtr(true),
