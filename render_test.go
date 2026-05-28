@@ -12,6 +12,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/styles"
 	"github.com/charmbracelet/glow/v2/internal/alerts"
+	"github.com/charmbracelet/glow/v2/internal/links"
 	"github.com/charmbracelet/x/exp/golden"
 )
 
@@ -137,6 +138,22 @@ addReportEntryWithFixture(t.Name(), true, raw, htmlOut, "links_images.md")
 	assertContains(t, ansiOut, "Alt text for image")
 
 	golden.RequireEqual(t, []byte(ansiOut))
+}
+
+func TestOSC8LinksApplied(t *testing.T) {
+	_, ansiOut, _ := renderFixture(t, "links_images.md")
+
+	// Apply OSC 8 post-processing (same as the real pipeline)
+	withLinks := links.AddOSC8Links(ansiOut)
+
+	// OSC 8 sequences should be present for URLs
+	if !strings.Contains(withLinks, "\x1b]8;;https://example.com\x1b\\") {
+		t.Error("expected OSC 8 sequence for https://example.com")
+	}
+
+	// The original text should still be present
+	assertContains(t, withLinks, "a link to example")
+	assertContains(t, withLinks, "example.com")
 }
 
 func TestRenderTables(t *testing.T) {

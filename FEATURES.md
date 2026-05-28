@@ -69,7 +69,7 @@ These features work today in moonpool — no gaps.
 
 These are commonly used features that can be implemented with minimal effort.
 
-#### 1. GitHub Alerts / Admonitions
+#### ~~1. GitHub Alerts / Admonitions~~ ✅ IMPLEMENTED
 ```markdown
 > [!NOTE]
 > This is a note callout.
@@ -91,7 +91,7 @@ These are commonly used features that can be implemented with minimal effort.
 
 ---
 
-#### 2. OSC 8 Clickable Hyperlinks
+#### ~~2. OSC 8 Clickable Hyperlinks~~ ✅ IMPLEMENTED
 ```
 Regular link: [click me](https://example.com)
 Currently shows: click me (https://example.com)
@@ -111,7 +111,7 @@ Should emit: \e]8;;https://example.com\aclick me\e]8;;\a
 
 ---
 
-#### 3. Live Reload / File Watching
+#### ~~3. Live Reload / File Watching~~ ✅ ALREADY IMPLEMENTED
 | Dimension | Rating |
 |-----------|--------|
 | Relevance | 🟡 Common — useful when editing markdown |
@@ -364,9 +364,9 @@ Worth noting: glamour has a known bug (issue #313) where nested blockquotes are 
 
 | # | Feature | Relevance | Difficulty | Quick Win? |
 |---|---------|-----------|------------|------------|
-| 1 | GitHub Alerts/Admonitions | 🔴 Critical | 🟦 Easy | ✅ Yes |
-| 2 | OSC 8 Clickable Links | 🔴 Critical | ⬜ Trivial | ✅ Yes |
-| 3 | Live Reload | 🟡 Common | ⬜ Trivial | ✅ Yes |
+| ~~1~~ | ~~GitHub Alerts/Admonitions~~ | 🔴 Critical | 🟦 Easy | ✅ Done |
+| ~~2~~ | ~~OSC 8 Clickable Links~~ | 🔴 Critical | ⬜ Trivial | ✅ Done |
+| ~~3~~ | ~~Live Reload~~ | 🟡 Common | ⬜ Trivial | ✅ Already existed |
 | 4 | Clipboard Copy | 🟡 Common | ⬜ Trivial | ✅ Yes |
 | 5 | Highlight `==text==` | 🟢 Niche | 🟦 Easy | ✅ Yes |
 | 6 | Smart Typography | 🟢 Niche | ⬜ Trivial | ✅ Yes |

@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glow/v2/internal/alerts"
+	"github.com/charmbracelet/glow/v2/internal/links"
 	"github.com/charmbracelet/glow/v2/utils"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -456,6 +457,9 @@ func glamourRender(m pagerModel, markdown string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error rendering markdown: %w", err)
 	}
+
+	// Post-process: add OSC 8 clickable hyperlinks
+	out = links.AddOSC8Links(out)
 
 	if isCode {
 		out = strings.TrimSpace(out)
