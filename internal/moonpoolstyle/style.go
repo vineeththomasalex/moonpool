@@ -61,22 +61,22 @@ func Config() ansi.StyleConfig {
 		Indent: uintPtr(3),
 	}
 
-	// H4: Slate blue, bold, dark bg
+	// H4: Same color as H3, bold, dark bg
 	s.H4 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix:          " ",
-			Color:           stringPtr("#5f87af"),
+			Color:           stringPtr("#5f87d7"),
 			BackgroundColor: darkBg,
 			Bold:            boolPtr(true),
 		},
 		Indent: uintPtr(4),
 	}
 
-	// H5: Slate blue, dark bg
+	// H5: Lighter slate blue, dark bg
 	s.H5 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix:          " ",
-			Color:           stringPtr("#5f87af"),
+			Color:           stringPtr("#5f87bf"),
 			BackgroundColor: darkBg,
 		},
 		Indent: uintPtr(5),
