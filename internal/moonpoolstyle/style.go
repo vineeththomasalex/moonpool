@@ -24,7 +24,7 @@ func Config() ansi.StyleConfig {
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix:    " ",
 			Suffix:    " ",
-			Color:     stringPtr("#5fafff"),
+			Color:     stringPtr("#87d7ff"),
 			Bold:      boolPtr(true),
 			Underline: boolPtr(true),
 		},
@@ -53,30 +53,30 @@ func Config() ansi.StyleConfig {
 		Indent: uintPtr(3),
 	}
 
-	// H4: Steel blue, bold
+	// H4: Same as H3, bold
 	s.H4 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix: " ",
-			Color:  stringPtr("#87afd7"),
+			Color:  stringPtr("#5f87af"),
 			Bold:   boolPtr(true),
 		},
 		Indent: uintPtr(4),
 	}
 
-	// H5: Light blue
+	// H5: Same as H3
 	s.H5 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix: " ",
-			Color:  stringPtr("#87afdf"),
+			Color:  stringPtr("#5f87af"),
 		},
 		Indent: uintPtr(5),
 	}
 
-	// H6: Dim light blue
+	// H6: Same as H3, faint
 	s.H6 = ansi.StyleBlock{
 		StylePrimitive: ansi.StylePrimitive{
 			Prefix: " ",
-			Color:  stringPtr("#87afdf"),
+			Color:  stringPtr("#5f87af"),
 			Faint:  boolPtr(true),
 		},
 		Indent: uintPtr(6),
